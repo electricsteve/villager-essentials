@@ -26,7 +26,7 @@
  *
  */
 
-package me.kylehunady;
+package me.kylehunady.events;
 
 import java.util.Arrays;
 

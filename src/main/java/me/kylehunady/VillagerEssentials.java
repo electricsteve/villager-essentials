@@ -27,6 +27,10 @@
 
 package me.kylehunady;
 
+import me.kylehunady.bStats.Metrics;
+import me.kylehunady.events.GossipHandler;
+import me.kylehunady.events.ZombieLootHandler;
+import me.kylehunady.events.ZombificationHandler;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.util.logging.Level;
@@ -49,6 +53,22 @@ public final class VillagerEssentials extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ZombificationHandler(), this);
         LogInfo("Listeners registered.");
         LogInfo("VillagerEssentials enabled!");
+
+        // All you have to do is adding the following two lines in your onEnable method.
+        // You can find the plugin ids of your plugins on the page https://bstats.org/what-is-my-plugin-id
+        int pluginId = 	19039; // <-- Replace with the id of your plugin!
+        Metrics metrics = new Metrics(this, pluginId);
+
+        // Optional: Add custom charts
+        metrics.addCustomChart(new Metrics.SimplePie("guaranteed_zombification", () -> {
+            return config.getBoolean("enable-guaranteed-zombification") ? "Enabled" : "Disabled";
+        }));
+        metrics.addCustomChart(new Metrics.SimplePie("global_discounts", () -> {
+            return config.getBoolean("enable-global-discounts") ? "Enabled" : "Disabled";
+        }));
+        metrics.addCustomChart(new Metrics.SimplePie("easy_zombie_containment", () -> {
+            return config.getBoolean("enable-easy-zombie-containment") ? "Enabled" : "Disabled";
+        }));
     }
 
     @Override
