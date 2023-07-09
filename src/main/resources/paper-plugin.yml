@@ -1,0 +1,8 @@
+name: VillagerEssentials
+version: '${version}'
+main: me.kylehunady.VillagerEssentials
+api-version: '1.20'
+prefix: VillagerEssentials
+authors: [KHunady, ElectricSteve]
+description: Adds a few extra features to villagers
+website: ${url}

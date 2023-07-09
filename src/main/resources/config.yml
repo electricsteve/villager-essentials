@@ -1,0 +1,6 @@
+# Enable global discounts
+enable-global-discounts: true
+# Enable guaranteed zombification
+enable-guaranteed-zombification: true
+# Enable easy zombie containment
+enable-easy-zombie-containment: true
