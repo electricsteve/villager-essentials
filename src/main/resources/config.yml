@@ -4,3 +4,7 @@ enable-global-discounts: true
 enable-guaranteed-zombification: true
 # Enable easy zombie containment
 enable-easy-zombie-containment: true
+# Enable sending stats to bStats
+enable-bstats: true
+# Enable plugin
+enable-plugin: true
