@@ -27,6 +27,10 @@
 
 package me.kylehunady;
 
+import me.kylehunady.bStats.Metrics;
+import me.kylehunady.events.GossipHandler;
+import me.kylehunady.events.ZombieLootHandler;
+import me.kylehunady.events.ZombificationHandler;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.util.logging.Level;
@@ -37,17 +41,56 @@ public final class VillagerEssentials extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        LogInfo("VillagerEssentials is loading...");
+        plugin = this;
+
+        // Register config
+        LogInfo("Loading config.");
         config.addDefault("enable-guaranteed-zombification", true);
         config.addDefault("enable-global-discounts", true);
         config.addDefault("enable-easy-zombie-containment", true);
+        config.addDefault("enable-bstats", true);
+        config.addDefault("enable-plugin", true);
         saveConfig();
+        LogInfo("Config loaded.");
 
-        plugin = this;
+        // Check if plugin is enabled
+        if (!(config.getBoolean("enable-plugin"))) {
+            LogInfo("Plugin is disabled in config. Disabling plugin.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        // Register event listeners
         LogInfo("Registering listeners.");
         getServer().getPluginManager().registerEvents(new GossipHandler(), this);
         getServer().getPluginManager().registerEvents(new ZombieLootHandler(), this);
         getServer().getPluginManager().registerEvents(new ZombificationHandler(), this);
         LogInfo("Listeners registered.");
+
+        // Check if stats should be sent to bStats
+        if (config.getBoolean("enable-bstats")) {
+            // Register bStats metrics
+            int pluginId = 	19039;
+            Metrics metrics = new Metrics(this, pluginId);
+
+            // Add custom charts
+            metrics.addCustomChart(new Metrics.SimplePie("guaranteed_zombification", () -> {
+                return config.getBoolean("enable-guaranteed-zombification") ? "Enabled" : "Disabled";
+            }));
+            metrics.addCustomChart(new Metrics.SimplePie("global_discounts", () -> {
+                return config.getBoolean("enable-global-discounts") ? "Enabled" : "Disabled";
+            }));
+            metrics.addCustomChart(new Metrics.SimplePie("easy_zombie_containment", () -> {
+                return config.getBoolean("enable-easy-zombie-containment") ? "Enabled" : "Disabled";
+            }));
+            LogInfo("Stats will be sent to bStats.");
+        } else {
+            // Don't send stats to bStats
+            LogInfo("Stats will not be sent to bStats.");
+        }
+
+        // Keep at end of method.
         LogInfo("VillagerEssentials enabled!");
     }
 
@@ -58,9 +101,5 @@ public final class VillagerEssentials extends JavaPlugin {
 
     private void LogInfo(String msg) {
         plugin.getLogger().log(Level.INFO, msg);
-    }
-
-    public static VillagerEssentials getPlugin() {
-        return plugin;
     }
 }

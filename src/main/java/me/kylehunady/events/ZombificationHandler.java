@@ -25,34 +25,39 @@
  *
  */
 
-package me.kylehunady;
+package me.kylehunady.events;
 
-import java.util.Random;
-
+import me.kylehunady.Helper;
+import me.kylehunady.VillagerEssentials;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.*;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
 
-import io.github.bananapuncher714.nbteditor.NBTEditor;
-
-public class ZombieLootHandler implements Listener {
+public class ZombificationHandler implements Listener {
     FileConfiguration config = VillagerEssentials.getPlugin(VillagerEssentials.class).getConfig();
+
+    /** @noinspection unused */
     @EventHandler
-    public void onCreatureSpawn(CreatureSpawnEvent event) {
-        if (!(config.getBoolean("enable-easy-zombie-containment"))) return;
+    public void onEntityDeath(EntityDeathEvent event) {
+        if (!(config.getBoolean("enable-guaranteed-zombification"))) return;
 
-        Entity entity = event.getEntity();
+        Entity deadEntity = event.getEntity();
 
-        // Check if entity is a zombie variant
-        if (!(Helper.isZombieType(entity.getType()))) return;
+        // Check if dead entity is a villager
+        if (!(deadEntity instanceof Villager)) return;
+        Villager villagerEnt = (Villager) deadEntity;
 
-        Random rand = new Random();
-        // generate number 0 or 1 (50% chance)
-        // origin is inclusive, bound is exclusive
-        boolean canPickUp = rand.nextInt(0,2) == 1;
-        
-        NBTEditor.set(entity,canPickUp,"CanPickUpLoot");
+        EntityDamageEvent deathEvent = villagerEnt.getLastDamageCause();
+
+        // Check if death was caused by another entity
+        if (!(deathEvent.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK)) return;
+        Entity killerEnt = ((EntityDamageByEntityEvent) deathEvent).getDamager();
+
+        // Check if killer is a zombie variant
+        if (!(Helper.isZombieType(killerEnt.getType()))) return;
+
+        villagerEnt.zombify();
     }
 }
