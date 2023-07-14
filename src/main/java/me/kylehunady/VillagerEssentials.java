@@ -102,8 +102,4 @@ public final class VillagerEssentials extends JavaPlugin {
     private void LogInfo(String msg) {
         plugin.getLogger().log(Level.INFO, msg);
     }
-
-    public static VillagerEssentials getPlugin() {
-        return plugin;
-    }
 }
